@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hache, agenda docente</title>
+  
+  <!-- Tipografía Roboto y Material Symbols de Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Product+Sans:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+  <style>
+    :root {
+      --primary: #1972D2;
+      --primary-dark: #0D47A1;
+      --primary-container: #E8F0FE;
+      --surface: #F6F8FC;
+      --surface-card: #FFFFFF;
+      --outline: #E0E3EB;
+      --text-main: #1C1B1F;
+      --text-muted: #5F6368;
+
+      /* Notas y asistencias */
+      --color-tea: #1A73E8;        /* Azul */
+      --color-tea-bg: #E8F0FE;
+      --color-tep: #1E8E3E;        /* Verde */
+      --color-tep-bg: #E6F4EA;
+      --color-ted: #D93025;        /* Rojo */
+      --color-ted-bg: #FCE8E6;
+      --color-yellow: #B06000;     /* Amarillo notas 4-6 */
+      --color-yellow-bg: #FEF7E0;
+      --color-sin-clase: #5F6368;  /* S - Sin clase */
+      --color-sin-clase-bg: #ECEFF1;
+
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 2px 6px rgba(0,0,0,0.05);
+      --shadow-md: 0 6px 18px rgba(0,0,0,0.07);
+      --shadow-lg: 0 12px 30px rgba(25, 114, 210, 0.18);
+
+      /* Patrón sutil de fondo */
+      --pattern-subtle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80' fill='none' stroke='%231972D2' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round' opacity='0.04'%3E%3Cpath d='M12 16 c3-2 9-2 12 0 c3-2 9-2 12 0 v14 c-3-2-9-2-12 0 c-3-2-9-2-12 0 z M24 16 v14'/%3E%3Cpath d='M55 12 l8 8 l-14 14 l-8-8 z M45 30 l-4 9 l9-4 z'/%3E%3Cpath d='M15 55 l1.5 3 l3.5 0.5 l-2.5 2.5 l0.5 3.5 l-3-1.5 l-3 1.5 l0.5-3.5 l-2.5-2.5 l3.5-0.5 z'/%3E%3Cpath d='M52 52 l14-5 l14 5 l-14 5 z M58 55 v6 c0 3 6 5 8 5 s8-2 8-5 v-6'/%3E%3Ccircle cx='38' cy='45' r='4'/%3E%3Cpath d='M36 51 h4'/%3E%3C/svg%3E");
+
+      /* Patrón decorativo tarjeta bienvenida */
+      --pattern-hero: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90' fill='none' stroke='%23FFFFFF' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' opacity='0.18'%3E%3Cpath d='M14 18 c4-3 10-3 14 0 c4-3 10-3 14 0 v16 c-4-3-10-3-14 0 c-4-3-10-3-14 0 z M28 18 v16'/%3E%3Cpath d='M62 14 l9 9 l-16 16 l-9-9 z M51 34 l-5 11 l11-5 z'/%3E%3Cpath d='M18 64 l2 4 l4.5 0.5 l-3 3 l1 4.5 l-4.5-2 l-4.5 2 l1-4.5 l-3-3 l4.5-0.5 z' fill='%23FFFFFF' fill-opacity='0.15'/%3E%3Cpath d='M60 62 l16-6 l16 6 l-16 6 z M67 65 v7 c0 3 7 6 9 6 s9-3 9-6 v-7'/%3E%3Ccircle cx='44' cy='52' r='5'/%3E%3Cpath d='M41 60 h6 M42 63 h4'/%3E%3C/svg%3E");
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      background-color: var(--surface);
+      background-image: var(--pattern-subtle);
+      background-repeat: repeat;
+      background-size: 80px 80px;
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* BARRA LATERAL (DRAWER) */
+    aside.android-drawer {
+      width: 290px;
+      background: var(--surface-card);
+      border-right: 1px solid var(--outline);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 30;
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .drawer-header {
+      padding: 22px 18px;
+      border-bottom: 1px solid var(--outline);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .brand-logo-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary), #7C4DFF);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .schools-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+    }
+
+    .section-title-sm {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      padding-left: 6px;
+    }
+
+    .school-accordion {
+      background: #F1F4F9;
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .school-accordion.active {
+      border-color: var(--primary);
+      background: var(--primary-container);
+    }
+
+    .school-bar {
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .school-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .school-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .courses-box {
+      padding: 4px 10px 10px 48px;
+      display: none;
+    }
+
+    .school-accordion.open .courses-box {
+      display: block;
+    }
+
+    .course-pill-item {
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      border: 1px solid var(--outline);
+    }
+
+    .course-pill-item:hover, .course-pill-item.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    main.main-viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    header.android-topbar {
+      height: 62px;
+      background: var(--surface-card);
+      border-bottom: 1px solid var(--outline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 10;
+    }
+
+    .btn-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: background 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: rgba(0,0,0,0.06);
+    }
+
+    .btn-app-action {
+      border: none;
+      background: #F1F4F9;
+      color: var(--text-main);
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-app-action:hover {
+      background: #E2E7F0;
+    }
+
+    .btn-app-action.btn-save-top {
+      background: var(--primary-container);
+      color: var(--primary-dark);
+    }
+
+    /* PESTAÑAS DENTRO DEL CURSO */
+    .view-filter-tabs {
+      display: flex;
+      background: #EAEFF6;
+      padding: 4px;
+      border-radius: var(--radius-full);
+      gap: 4px;
+      margin-bottom: 14px;
+      align-self: flex-start;
+    }
+
+    .tab-filter-btn {
+      border: none;
+      background: transparent;
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .tab-filter-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .screen-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: none;
+    }
+
+    .screen-view.active {
+      display: block;
+    }
+
+    /* PANTALLA INICIO */
+    .hero-hache-title {
+      font-family: 'Product Sans', sans-serif;
+      font-size: 34px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .hero-hache-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .greeting-card {
+      background: linear-gradient(135deg, #1565C0 0%, #1972D2 40%, #5E35B1 100%);
+      background-image: var(--pattern-hero), linear-gradient(135deg, #1565C0 0%, #1972D2 40%, #5E35B1 100%);
+      background-size: 90px 90px, auto;
+      background-repeat: repeat, no-repeat;
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      color: white;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .greeting-content {
+      max-width: 72%;
+    }
+
+    .greeting-content h2 {
+      font-size: 26px;
+      font-weight: 900;
+      font-family: 'Product Sans', sans-serif;
+      margin-bottom: 6px;
+    }
+
+    .greeting-content p {
+      font-size: 14px;
+      line-height: 1.45;
+      opacity: 0.95;
+      margin-bottom: 16px;
+    }
+
+    .hero-badge-art {
+      width: 90px;
+      height: 90px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* CALENDARIO */
+    .calendar-card {
+      background: var(--surface-card);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--outline);
+    }
+
+    .calendar-filter-pills {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .pill-filter {
+      border: none;
+      background: #F1F4F9;
+      padding: 7px 16px;
+      border-radius: var(--radius-full);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .pill-filter.active {
+      background: var(--primary-container);
+      color: var(--primary-dark);
+    }
+
+    .event-card {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--outline);
+      border-left: 6px solid var(--primary);
+    }
+
+    .event-card.paro { border-left-color: var(--color-ted); }
+    .event-card.feriado { border-left-color: #9C27B0; }
+    .event-card.examen { border-left-color: var(--color-tea); }
+    .event-card.tp { border-left-color: var(--color-tep); }
+    .event-card.salida { border-left-color: #E65100; }
+
+    /* ESTADOS VACÍOS */
+    .empty-state-view {
+      text-align: center;
+      padding: 34px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-icon-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-full);
+      background: var(--primary-container);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .empty-state-view h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .empty-state-view p {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 360px;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    /* BOTONES */
+    .btn-filled {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-tonal {
+      background: var(--primary-container);
+      color: var(--primary-dark);
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* TABLA INTEGRAL PANORÁMICA DE ALTA DENSIDAD */
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      background: white;
+      border: 1px solid var(--outline);
+      max-height: calc(100vh - 210px);
+    }
+
+    table.modern-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12px;
+    }
+
+    table.modern-table th, table.modern-table td {
+      border-bottom: 1px solid var(--outline);
+      border-right: 1px solid rgba(0,0,0,0.05);
+      padding: 7px 6px;
+      text-align: center;
+    }
+
+    table.modern-table th.col-student, table.modern-table td.col-student {
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 3;
+      text-align: left;
+      font-weight: 600;
+      min-width: 190px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    }
+
+    table.modern-table th {
+      background: #F8F9FA;
+      color: var(--text-muted);
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    table.modern-table th.col-student {
+      z-index: 4;
+    }
+
+    /* ENCABEZADOS DE SECCIÓN */
+    .section-th-header {
+      background: #EEF3FA !important;
+      color: var(--primary-dark) !important;
+      font-weight: 800 !important;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #C8D8ED !important;
+    }
+
+    /* ENCABEZADOS VERTICALES PARA EXÁMENES (COMPACTOS) */
+    .th-vertical {
+      height: 110px;
+      width: 40px;
+      min-width: 40px;
+      max-width: 40px;
+      padding: 4px 1px !important;
+      vertical-align: bottom;
+    }
+
+    .vertical-title {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 10.5px;
+      font-weight: 700;
+      height: 85px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .th-del-btn {
+      color: var(--color-ted);
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    /* CELDAS ASISTENCIA COMPACTAS */
+    .chip-att {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      transition: all 0.1s;
+    }
+
+    /* ESTADO INICIAL VACÍO */
+    .chip-empty {
+      background: #FAFAFA;
+      color: #9E9E9E;
+      border: 1.5px dashed #D1D5DB;
+    }
+
+    .chip-P { background: var(--color-tep-bg); color: var(--color-tep); border: 1px solid var(--color-tep); }
+    .chip-A { background: var(--color-ted-bg); color: var(--color-ted); border: 1px solid var(--color-ted); }
+    .chip-S { background: var(--color-sin-clase-bg); color: var(--color-sin-clase); border: 1px solid #B0BEC5; }
+
+    /* NOTAS Y VALORACIONES */
+    .chip-grade {
+      display: inline-block;
+      width: 30px;
+      height: 28px;
+      line-height: 28px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-align: center;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .g-red { background: var(--color-ted-bg); color: var(--color-ted); }
+    .g-yellow { background: var(--color-yellow-bg); color: var(--color-yellow); }
+    .g-blue { background: var(--color-tea-bg); color: var(--color-tea); }
+
+    .val-badge {
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 800;
+      font-size: 10.5px;
+      letter-spacing: 0.3px;
+      display: inline-block;
+    }
+
+    .val-TEA { background: var(--color-tea-bg); color: var(--color-tea); border: 1px solid var(--color-tea); }
+    .val-TEP { background: var(--color-tep-bg); color: var(--color-tep); border: 1px solid var(--color-tep); }
+    .val-TED { background: var(--color-ted-bg); color: var(--color-ted); border: 1px solid var(--color-ted); }
+
+    /* BOTÓN FLOTANTE IA */
+    .fab-ia {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      height: 52px;
+      padding: 0 18px;
+      background: linear-gradient(135deg, var(--primary), #7C4DFF);
+      color: white;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13.5px;
+      z-index: 50;
+      transition: transform 0.2s;
+    }
+
+    .fab-ia:hover {
+      transform: scale(1.05);
+    }
+
+    /* MODALES */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-window {
+      background: white;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1.5px solid var(--outline);
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+    }
+
+    /* CHAT ASISTENTE */
+    .chat-container {
+      max-height: 280px;
+      overflow-y: auto;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-bubble {
+      padding: 11px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      line-height: 1.4;
+      max-width: 85%;
+    }
+
+    .bubble-ia {
+      background: #F0F4F9;
+      color: #1F1F1F;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble-user {
+      background: var(--primary);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .quick-chip {
+      font-size: 11px;
+      padding: 6px 12px;
+      background: var(--primary-container);
+      color: var(--primary-dark);
+      border: 1px solid rgba(25, 114, 210, 0.2);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      margin-right: 4px;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    /* TOAST */
+    #androidToast {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #2C3036;
+      color: white;
+      padding: 11px 22px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+      pointer-events: none;
+    }
+
+    #androidToast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* IMPRESIÓN OFICIAL */
+    #printReportArea {
+      display: none;
+    }
+
+    @media print {
+      body * { visibility: hidden !important; }
+      #printReportArea, #printReportArea * { visibility: visible !important; }
+      #printReportArea {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white;
+        color: black;
+        font-family: Arial, sans-serif;
+        padding: 10px;
+      }
+      @page { size: A4 landscape; margin: 1cm; }
+      table.print-report-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+        margin-top: 14px;
+      }
+      table.print-report-table th, table.print-report-table td {
+        border: 1px solid #333;
+        padding: 5px 6px;
+        text-align: center;
+      }
+      table.print-report-table th { background-color: #EEE !important; font-weight: bold; }
+      table.print-report-table td.text-left { text-align: left; font-weight: bold; }
+      .badge-print { font-weight: bold; padding: 2px 4px; }
+    }
+
+    @media (max-width: 850px) {
+      aside.android-drawer { position: fixed; left: -300px; height: 100%; }
+      aside.android-drawer.open { transform: translateX(300px); }
+      .greeting-content { max-width: 100%; }
+      .hero-badge-art { display: none; }
+      .hide-mobile-text span:not(.material-symbols-rounded) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA LATERAL (DRAWER) -->
+  <aside class="android-drawer" id="appDrawer">
+    <div class="drawer-header" onclick="goToHome()">
+      <div class="brand-logo-icon">
+        <span class="material-symbols-rounded" style="font-size: 26px;">school</span>
+      </div>
+      <div>
+        <h3 style="font-family: 'Product Sans'; font-size: 19px; font-weight: 700; color: var(--primary);">Hache</h3>
+        <p style="font-size: 12px; color: var(--text-muted);">Agenda Docente</p>
+      </div>
+    </div>
+
+    <div class="schools-container">
+      <div class="section-title-sm">Tus Escuelas</div>
+      <div id="schoolListRender">
+        <!-- Render dinámico -->
+      </div>
+
+      <button class="btn-tonal" style="width: 100%; margin-top: 10px;" onclick="openAddSchoolModal()">
+        <span class="material-symbols-rounded">add</span>
+        Agregar Escuela
+      </button>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO CENTRAL -->
+  <main class="main-viewport">
+    <header class="android-topbar">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button class="btn-icon" onclick="toggleDrawer()">
+          <span class="material-symbols-rounded">menu</span>
+        </button>
+        <button class="btn-icon" onclick="goToHome()" title="Ir al Inicio">
+          <span class="material-symbols-rounded">home</span>
+        </button>
+        <div id="topCourseInfo">
+          <h2 style="font-size: 15.5px; font-weight: 700;" id="topTitleBar">Inicio</h2>
+          <span style="font-size: 11px; color: var(--text-muted);" id="topSubtitleBar">Hache, agenda docente</span>
+        </div>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN: GUARDAR E IMPRIMIR -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button class="btn-app-action btn-save-top hide-mobile-text" onclick="handleManualSave()" title="Guardar cambios">
+          <span class="material-symbols-rounded" style="font-size: 18px;">save</span>
+          <span>Guardar</span>
+        </button>
+        <button class="btn-app-action hide-mobile-text" onclick="openPrintModal()" title="Imprimir planilla">
+          <span class="material-symbols-rounded" style="font-size: 18px;">print</span>
+          <span>Imprimir</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 1. PANTALLA DE INICIO (HOME) -->
+    <div class="screen-view active" id="screenHome">
+      <div class="hero-hache-title">
+        <span class="material-symbols-rounded" style="font-size: 38px; color: var(--primary);">auto_stories</span>
+        Hache, agenda docente
+      </div>
+      <p class="hero-hache-subtitle">Planificación semanal, registro de asistencias y valoraciones pedagógicas.</p>
+
+      <!-- TARJETA DE BIENVENIDA -->
+      <div class="greeting-card">
+        <div class="greeting-content">
+          <h2>¡Hola, profe! 👋</h2>
+          <p>
+            Bienvenido/a a tu agenda. Agrega tus instituciones desde el panel izquierdo.
+            Aquí abajo tienes disponible tu calendario de paros, feriados, exámenes y trabajos prácticos.
+          </p>
+          <button class="btn-filled" style="background: white; color: var(--primary-dark);" onclick="openAddEventModal()">
+            <span class="material-symbols-rounded">add_circle</span>
+            Cargar Evento en Calendario
+          </button>
+        </div>
+
+        <div class="hero-badge-art">
+          <span class="material-symbols-rounded" style="font-size: 44px; color: white;">calendar_month</span>
+        </div>
+      </div>
+
+      <!-- CALENDARIO DE EVENTOS -->
+      <div class="calendar-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <div>
+            <h3 style="font-size: 17px; font-weight: 700;">Calendario Escolar y Agenda</h3>
+            <p style="font-size: 12px; color: var(--text-muted);">Fechas importantes: paros, feriados, exámenes y entregas</p>
+          </div>
+          <button class="btn-tonal" onclick="openAddEventModal()">
+            <span class="material-symbols-rounded">event</span>
+            Nuevo Evento
+          </button>
+        </div>
+
+        <div class="calendar-filter-pills">
+          <button class="pill-filter active" onclick="filterEvents('semana', this)">Semana</button>
+          <button class="pill-filter" onclick="filterEvents('mes', this)">Mes</button>
+          <button class="pill-filter" onclick="filterEvents('cuatrimestre', this)">Cuatrimestre</button>
+        </div>
+
+        <div id="eventsContainer">
+          <!-- Dinámico -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PANTALLA DEL CURSO (PLANILLA INTEGRAL) -->
+    <div class="screen-view" id="screenCourse">
+      
+      <div class="calendar-card" style="padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+          
+          <!-- SELECTOR DE VISTA: INTEGRAL / SOLO ASISTENCIA / SOLO NOTAS -->
+          <div class="view-filter-tabs">
+            <button class="tab-filter-btn active" id="tabIntegral" onclick="setTableViewMode('all')">
+              <span class="material-symbols-rounded" style="font-size: 17px;">view_quilt</span>
+              Planilla Integral (Todo junto)
+            </button>
+            <button class="tab-filter-btn" id="tabSoloAtt" onclick="setTableViewMode('attendance')">
+              <span class="material-symbols-rounded" style="font-size: 17px;">fact_check</span>
+              Solo Asistencia
+            </button>
+            <button class="tab-filter-btn" id="tabSoloGrades" onclick="setTableViewMode('grades')">
+              <span class="material-symbols-rounded" style="font-size: 17px;">grade</span>
+              Solo Notas
+            </button>
+          </div>
+
+          <!-- BOTONES DE ACCIÓN DEL CURSO -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-tonal" onclick="openConfigDiasModal()" title="Configurar días de clase">
+              <span class="material-symbols-rounded">tune</span>
+              Días de Clase
+            </button>
+            <button class="btn-filled" onclick="openAddStudentModal()">
+              <span class="material-symbols-rounded">person_add</span>
+              Estudiante
+            </button>
+            <button class="btn-filled" style="background: #2E7D32;" onclick="openAddExamModal()">
+              <span class="material-symbols-rounded">add_circle</span>
+              Examen / TP
+            </button>
+          </div>
+        </div>
+
+        <!-- TABLA DINÁMICA -->
+        <div id="unifiedTableWrapper" class="table-responsive">
+          <!-- Generada por JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- BOTÓN FLOTANTE HACHE IA -->
+  <button class="fab-ia" onclick="openIaModal()">
+    <span class="material-symbols-rounded">auto_awesome</span>
+    Hache IA
+  </button>
+
+  <!-- SNACKBAR DE CONFIRMACIÓN -->
+  <div id="androidToast">
+    <span class="material-symbols-rounded" style="color: #4CAF50; font-size: 19px;">check_circle</span>
+    <span id="toastMessage">Cambios guardados</span>
+  </div>
+
+  <!-- ==================== MODALES ==================== -->
+
+  <!-- MODAL: IMPRIMIR PLANILLA -->
+  <div class="modal-backdrop" id="modalPrint">
+    <div class="modal-window" style="max-width: 500px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="material-symbols-rounded" style="color: var(--primary);">print</span>
+          <h3 style="font-size: 17px; font-weight: 700;">Opciones de Impresión</h3>
+        </div>
+        <button class="btn-icon" onclick="closeModal('modalPrint')">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label>Período / Cuatrimestre</label>
+        <select id="printCuatrimestreSelect" class="form-control">
+          <option value="ambos">Ambos Cuatrimestres (Informe Anual)</option>
+          <option value="1C">1er Cuatrimestre</option>
+          <option value="2C">2do Cuatrimestre</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Filtrar Estudiantes</label>
+        <select id="printFilterStudents" class="form-control">
+          <option value="todos">Todos los estudiantes</option>
+          <option value="aprobados">Solo Aprobados (TEA / Promedio ≥ 7)</option>
+          <option value="desaprobados">Solo Desaprobados / En Proceso (TEP / TED)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Columnas a Incluir en la Hoja</label>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 7px; margin-top: 6px; font-size: 13px;">
+          <label style="display: flex; align-items: center; gap: 8px; color: #777;">
+            <input type="checkbox" checked disabled> Nombre del Estudiante <b>(Obligatorio)</b>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="printColPrelim" checked> Informes Preliminares (TEA, TEP, TED)
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="printColAtt" checked> Porcentaje de Asistencia
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="printColExams" checked> Nota de cada Trabajo Práctico y Examen
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="printColAvgVal" checked> Promedio y Valoración Final
+          </label>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+        <button class="btn-tonal" onclick="closeModal('modalPrint')">Cancelar</button>
+        <button class="btn-filled" onclick="executeCustomPrint()">
+          <span class="material-symbols-rounded">print</span>
+          Generar e Imprimir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AGREGAR ESCUELA -->
+  <div class="modal-backdrop" id="modalSchool">
+    <div class="modal-window">
+      <h3 style="margin-bottom: 14px; font-size: 17px;">Nueva Escuela y Curso</h3>
+      <div class="form-group">
+        <label>Nombre de la Escuela</label>
+        <input type="text" id="schoolNameInput" class="form-control" placeholder="Ej: E.E.S. N° 4">
+      </div>
+      <div class="form-group">
+        <label>Curso / División</label>
+        <input type="text" id="courseNameInput" class="form-control" placeholder="Ej: 3° 1ra">
+      </div>
+      <div class="form-group">
+        <label>Materia / Asignatura</label>
+        <input type="text" id="subjectNameInput" class="form-control" placeholder="Ej: Historia">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+        <button class="btn-tonal" onclick="closeModal('modalSchool')">Cancelar</button>
+        <button class="btn-filled" onclick="confirmAddSchool()">Crear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AGREGAR ESTUDIANTE -->
+  <div class="modal-backdrop" id="modalStudent">
+    <div class="modal-window">
+      <h3 style="margin-bottom: 14px; font-size: 17px;">Agregar Estudiante</h3>
+      <div class="form-group">
+        <label>Apellido y Nombre</label>
+        <input type="text" id="studentNameInput" class="form-control" placeholder="Ej: Gómez, Martín">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+        <button class="btn-tonal" onclick="closeModal('modalStudent')">Cancelar</button>
+        <button class="btn-filled" onclick="confirmAddStudent()">Guardar Estudiante</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AGREGAR EXAMEN -->
+  <div class="modal-backdrop" id="modalExam">
+    <div class="modal-window">
+      <h3 style="margin-bottom: 14px; font-size: 17px;">Nuevo Examen o Trabajo Práctico</h3>
+      <div class="form-group">
+        <label>Período / Cuatrimestre</label>
+        <select id="examCuatrimestreSelect" class="form-control">
+          <option value="1C">1er Cuatrimestre</option>
+          <option value="2C">2do Cuatrimestre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tipo de Evaluación</label>
+        <select id="examTypeSelect" class="form-control">
+          <option value="TP">Trabajo Práctico (TP)</option>
+          <option value="Examen">Examen Escrito</option>
+          <option value="Oral">Exposición Oral</option>
+          <option value="Defensa">Defensa de Proyecto</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Título o Tema</label>
+        <input type="text" id="examTitleInput" class="form-control" placeholder="Ej: TP 1 - Revolución de Mayo">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+        <button class="btn-tonal" onclick="closeModal('modalExam')">Cancelar</button>
+        <button class="btn-filled" onclick="confirmAddExam()">Crear Columna</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CARGAR EVENTO -->
+  <div class="modal-backdrop" id="modalEvent">
+    <div class="modal-window">
+      <h3 style="margin-bottom: 14px; font-size: 17px;">Cargar Evento en Calendario</h3>
+      <div class="form-group">
+        <label>Tipo de Evento</label>
+        <select id="evType" class="form-control">
+          <option value="paro">Medida de Fuerza / Paro</option>
+          <option value="feriado">Feriado o Asueto Escolar</option>
+          <option value="examen">Examen / Evaluación</option>
+          <option value="tp">Entrega de Trabajo Práctico</option>
+          <option value="salida">Salida Educativa</option>
+          <option value="ausencia">Ausencia Docente / Licencia</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Título / Descripción</label>
+        <input type="text" id="evTitle" class="form-control" placeholder="Ej: Feriado Nacional o Paro Docente">
+      </div>
+      <div style="display: flex; gap: 10px;" class="form-group">
+        <div style="flex: 1;">
+          <label>Fecha</label>
+          <input type="date" id="evDate" class="form-control">
+        </div>
+        <div style="width: 120px;">
+          <label>Hora</label>
+          <input type="time" id="evTime" class="form-control" value="08:00">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Curso o Institución</label>
+        <input type="text" id="evCourse" class="form-control" placeholder="Ej: Todos / 3° 1ra">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+        <button class="btn-tonal" onclick="closeModal('modalEvent')">Cancelar</button>
+        <button class="btn-filled" onclick="confirmAddEvent()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIGURAR DÍAS DE CLASE -->
+  <div class="modal-backdrop" id="modalDiasClase">
+    <div class="modal-window">
+      <h3 style="margin-bottom: 10px; font-size: 17px;">Días que dictas clases</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+        Selecciona qué días tienes clase con este curso. Se crearán las fechas <b>vacías</b> en la planilla:
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 9px;">
+        <label><input type="checkbox" id="d-1" checked> Lunes</label>
+        <label><input type="checkbox" id="d-2"> Martes</label>
+        <label><input type="checkbox" id="d-3" checked> Miércoles</label>
+        <label><input type="checkbox" id="d-4"> Jueves</label>
+        <label><input type="checkbox" id="d-5"> Viernes</label>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+        <button class="btn-tonal" onclick="closeModal('modalDiasClase')">Cerrar</button>
+        <button class="btn-filled" onclick="generateClassDates()">Generar Fechas</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: HACHE IA -->
+  <div class="modal-backdrop" id="modalIA">
+    <div class="modal-window" style="max-width: 540px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="material-symbols-rounded" style="color: #7C4DFF;">psychology</span>
+          <h3 style="font-size: 17px; font-weight: 700;">Hache IA - Asistente Docente</h3>
+        </div>
+        <button class="btn-icon" onclick="closeModal('modalIA')">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <div class="chat-container" id="iaChatBox">
+        <div class="chat-bubble bubble-ia">
+          ¡Hola, profe! Soy tu asistente en <b>Hache</b>. ¿Qué necesitas preparar hoy? Puedo ayudarte a redactar consignas, rúbricas, ideas de actividades o comunicados para las familias.
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <span class="quick-chip" onclick="askQuickPrompt('Redactar comunicado a familias por ausencias reiteradas')">⚠️ Aviso ausencias</span>
+        <span class="quick-chip" onclick="askQuickPrompt('Crear rúbrica de evaluación para Trabajo Práctico')">📋 Rúbrica de TP</span>
+        <span class="quick-chip" onclick="askQuickPrompt('Sugerir 3 actividades disparadoras breves')">💡 Actividad inicial</span>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="iaInput" class="form-control" placeholder="Escribe tu consulta pedagógica..." onkeydown="if(event.key==='Enter') sendIaMessage()">
+        <button class="btn-filled" style="background:#7C4DFF;" onclick="sendIaMessage()">
+          <span class="material-symbols-rounded">send</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÁREA DE IMPRESIÓN OFICIAL -->
+  <div id="printReportArea"></div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    const EMPTY_STORE = {
+      schools: [],
+      events: []
+    };
+
+    let store = JSON.parse(localStorage.getItem('hache_docente_clean')) || EMPTY_STORE;
+    let selectedSchoolId = null;
+    let selectedCourseId = null;
+    let currentViewMode = 'all'; // 'all' (Integral), 'attendance', 'grades'
+
+    function saveStore() {
+      localStorage.setItem('hache_docente_clean', JSON.stringify(store));
+    }
+
+    function showAndroidToast(text) {
+      const toast = document.getElementById('androidToast');
+      document.getElementById('toastMessage').innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2200);
+    }
+
+    function handleManualSave() {
+      saveStore();
+      showAndroidToast("¡Cambios guardados con éxito!");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSchoolsList();
+      renderEventsList('semana');
+    });
+
+    function toggleDrawer() {
+      document.getElementById('appDrawer').classList.toggle('open');
+    }
+
+    function goToHome() {
+      selectedSchoolId = null;
+      selectedCourseId = null;
+      document.getElementById('screenHome').classList.add('active');
+      document.getElementById('screenCourse').classList.remove('active');
+      document.getElementById('topTitleBar').innerText = 'Inicio';
+      document.getElementById('topSubtitleBar').innerText = 'Hache, agenda docente';
+      renderEventsList('semana');
+      if (window.innerWidth < 850) document.getElementById('appDrawer').classList.remove('open');
+    }
+
+    function getActiveCourse() {
+      const school = store.schools.find(s => s.id === selectedSchoolId);
+      return school ? school.courses.find(c => c.id === selectedCourseId) : null;
+    }
+
+    function getActiveSchool() {
+      return store.schools.find(s => s.id === selectedSchoolId);
+    }
+
+    /* GESTIÓN DE ESCUELAS */
+    function renderSchoolsList() {
+      const container = document.getElementById('schoolListRender');
+      container.innerHTML = '';
+
+      if (store.schools.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 18px 8px; color: var(--text-muted); font-size: 13px;">
+            <span class="material-symbols-rounded" style="font-size: 32px; color: #BBB;">apartment</span>
+            <p style="margin-top: 4px;">No tienes escuelas cargadas aún.</p>
+          </div>
+        `;
+        return;
+      }
+
+      store.schools.forEach(school => {
+        const acc = document.createElement('div');
+        acc.className = `school-accordion ${selectedSchoolId === school.id ? 'open active' : ''}`;
+        
+        let coursesHtml = '';
+        school.courses.forEach(c => {
+          coursesHtml += `
+            <div class="course-pill-item ${selectedCourseId === c.id ? 'active' : ''}" onclick="selectCourse(${school.id}, ${c.id})">
+              <span><b>${c.name}</b> - ${c.subject}</span>
+              <span class="material-symbols-rounded" style="font-size: 16px;">chevron_right</span>
+            </div>
+          `;
+        });
+
+        coursesHtml += `
+          <button class="btn-tonal" style="width: 100%; font-size: 11px; padding: 6px;" onclick="openAddCourseToSchool(${school.id})">
+            <span class="material-symbols-rounded" style="font-size: 14px;">add</span> Agregar Curso
+          </button>
+        `;
+
+        acc.innerHTML = `
+          <div class="school-bar" onclick="toggleSchoolAccordion(this)">
+            <div class="school-bar-left">
+              <div class="school-avatar">${school.name.charAt(0).toUpperCase()}</div>
+              <div>
+                <h4 style="font-size: 13px; font-weight: 700;">${school.name}</h4>
+                <span style="font-size: 11px; color: var(--text-muted);">${school.courses.length} curso(s)</span>
+              </div>
+            </div>
+            <span class="material-symbols-rounded" style="font-size: 18px; color: var(--text-muted);">expand_more</span>
+          </div>
+          <div class="courses-box">${coursesHtml}</div>
+        `;
+        container.appendChild(acc);
+      });
+    }
+
+    function toggleSchoolAccordion(el) {
+      el.parentElement.classList.toggle('open');
+    }
+
+    function selectCourse(schoolId, courseId) {
+      selectedSchoolId = schoolId;
+      selectedCourseId = courseId;
+
+      const school = store.schools.find(s => s.id === schoolId);
+      const course = school.courses.find(c => c.id === courseId);
+
+      document.getElementById('screenHome').classList.remove('active');
+      document.getElementById('screenCourse').classList.add('active');
+
+      document.getElementById('topTitleBar').innerText = `${course.name} - ${course.subject}`;
+      document.getElementById('topSubtitleBar').innerText = school.name;
+
+      renderSchoolsList();
+      renderUnifiedTable();
+
+      if (window.innerWidth < 850) {
+        document.getElementById('appDrawer').classList.remove('open');
+      }
+    }
+
+    function setTableViewMode(mode) {
+      currentViewMode = mode;
+      document.getElementById('tabIntegral').classList.toggle('active', mode === 'all');
+      document.getElementById('tabSoloAtt').classList.toggle('active', mode === 'attendance');
+      document.getElementById('tabSoloGrades').classList.toggle('active', mode === 'grades');
+      renderUnifiedTable();
+    }
+
+    /* ==============================================================
+       TABLA INTEGRAL: ASISTENCIAS + NOTAS AL MISMO TIEMPO
+       ============================================================== */
+    function renderUnifiedTable() {
+      const course = getActiveCourse();
+      const wrapper = document.getElementById('unifiedTableWrapper');
+
+      if (!course || course.students.length === 0) {
+        wrapper.innerHTML = `
+          <div class="empty-state-view">
+            <div class="empty-icon-circle">
+              <span class="material-symbols-rounded" style="font-size: 34px;">group_add</span>
+            </div>
+            <h4>No hay estudiantes en este curso</h4>
+            <p>Toca "+ Estudiante" para cargar tu nómina de alumnos.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const showAtt = (currentViewMode === 'all' || currentViewMode === 'attendance');
+      const showGrades = (currentViewMode === 'all' || currentViewMode === 'grades');
+
+      // 1. FILA DE SECCIÓN / GRUPO
+      let headerGroupRow = `<tr><th class="col-student section-th-header" rowspan="2">Estudiante</th>`;
+
+      if (showAtt) {
+        const attColSpan = 1 + course.dates.length;
+        headerGroupRow += `<th class="section-th-header" colspan="${attColSpan}">Control de Asistencia</th>`;
+      }
+
+      if (showGrades) {
+        const gradesColSpan = 2 + course.exams.length + 2; // Inf1 + Inf2 + Exámenes + Prom + Val
+        headerGroupRow += `<th class="section-th-header" colspan="${gradesColSpan}">Calificaciones y Valoración Pedagógica</th>`;
+      }
+      headerGroupRow += `</tr>`;
+
+      // 2. FILA DE COLUMNAS ESPECÍFICAS
+      let headerColsRow = `<tr>`;
+
+      if (showAtt) {
+        headerColsRow += `<th style="min-width: 60px;">% Asist.</th>`;
+        course.dates.forEach(d => {
+          headerColsRow += `<th style="min-width: 38px; font-size: 11px;">${d}</th>`;
+        });
+      }
+
+      if (showGrades) {
+        headerColsRow += `
+          <th style="min-width: 65px;">Inf. 1C</th>
+          <th style="min-width: 65px;">Inf. 2C</th>
+        `;
+
+        course.exams.forEach((ex, exIdx) => {
+          headerColsRow += `
+            <th class="th-vertical">
+              <span class="material-symbols-rounded th-del-btn" title="Eliminar examen" onclick="deleteExamColumn(${exIdx})">cancel</span>
+              <div class="vertical-title" title="${ex.name} (${ex.term || '1C'})">${ex.name}</div>
+            </th>
+          `;
+        });
+
+        headerColsRow += `
+          <th style="min-width: 55px;">Prom.</th>
+          <th style="min-width: 80px;">Valoración</th>
+        `;
+      }
+      headerColsRow += `</tr>`;
+
+      // 3. CUERPO DE LA TABLA
+      let tbodyHtml = `<tbody>`;
+
+      course.students.forEach((st, stIdx) => {
+        // Cálculo de Porcentaje: P / (P + A) excluyendo 'S' y '-' (vacíos)
+        let p = 0, a = 0;
+        st.att.forEach(val => {
+          if (val === 'P') p++;
+          if (val === 'A') a++;
+        });
+        const total = p + a;
+        const pct = total > 0 ? Math.round((p / total) * 100) : null;
+
+        // Cálculo de Promedio de notas
+        const validGrades = st.grades.filter(g => typeof g === 'number' && !isNaN(g));
+        let avg = 0;
+        if (validGrades.length > 0) {
+          avg = (validGrades.reduce((acc, curr) => acc + curr, 0) / validGrades.length).toFixed(1);
+        }
+
+        // Valoración según reglas solicitadas:
+        // TED: solo si el estudiante no fue nunca en el cuatrimestre (ningún P) o sin notas
+        // TEA: Promedio > 7
+        // TEP: Promedio entre 1 y 6
+        const asistioAlgunaVez = st.att.some(val => val === 'P');
+        let val = 'TEP';
+        if (!asistioAlgunaVez || validGrades.length === 0) {
+          val = 'TED';
+        } else if (parseFloat(avg) >= 7.0) {
+          val = 'TEA';
+        } else {
+          val = 'TEP';
+        }
+
+        tbodyHtml += `<tr><td class="col-student">${st.name}</td>`;
+
+        // SECCIÓN ASISTENCIA
+        if (showAtt) {
+          const pctText = pct !== null ? `${pct}%` : '-';
+          const pctColor = pct !== null ? (pct >= 75 ? 'var(--color-tep)' : pct >= 60 ? 'var(--color-yellow)' : 'var(--color-ted)') : 'var(--text-muted)';
+          
+          tbodyHtml += `<td style="font-weight: 700; color: ${pctColor};">${pctText}</td>`;
+
+          st.att.forEach((v, dIdx) => {
+            const displayVal = v === '-' ? '-' : v;
+            const chipClass = v === '-' ? 'chip-empty' : `chip-${v}`;
+            tbodyHtml += `
+              <td>
+                <span class="chip-att ${chipClass}" onclick="cycleAttendance(${stIdx}, ${dIdx})" title="Click: P -> A -> S -> Vacío">${displayVal}</span>
+              </td>
+            `;
+          });
+        }
+
+        // SECCIÓN CALIFICACIONES
+        if (showGrades) {
+          tbodyHtml += `
+            <td><span class="val-badge val-${st.p1}" style="cursor:pointer;" onclick="cyclePrelim(${stIdx}, 'p1')">${st.p1}</span></td>
+            <td><span class="val-badge val-${st.p2}" style="cursor:pointer;" onclick="cyclePrelim(${stIdx}, 'p2')">${st.p2}</span></td>
+          `;
+
+          course.exams.forEach((ex, exIdx) => {
+            const g = st.grades[exIdx] !== undefined ? st.grades[exIdx] : '-';
+            let gClass = '';
+            if (typeof g === 'number') {
+              if (g <= 3) gClass = 'g-red';
+              else if (g <= 6) gClass = 'g-yellow';
+              else gClass = 'g-blue';
+            }
+            tbodyHtml += `
+              <td>
+                <span class="chip-grade ${gClass}" onclick="setGradePrompt(${stIdx}, ${exIdx})">${g}</span>
+              </td>
+            `;
+          });
+
+          tbodyHtml += `
+            <td style="font-weight: 700;">${avg > 0 ? avg : '-'}</td>
+            <td><span class="val-badge val-${val}">${val}</span></td>
+          `;
+        }
+
+        tbodyHtml += `</tr>`;
+      });
+
+      tbodyHtml += `</tbody>`;
+
+      wrapper.innerHTML = `
+        <table class="modern-table">
+          <thead>${headerGroupRow}${headerColsRow}</thead>
+          ${tbodyHtml}
+        </table>
+      `;
+    }
+
+    /* CICLO DE ASISTENCIA: - -> P -> A -> S -> - */
+    function cycleAttendance(stIdx, dIdx) {
+      const course = getActiveCourse();
+      const current = course.students[stIdx].att[dIdx] || '-';
+      let next = '-';
+
+      if (current === '-') next = 'P';
+      else if (current === 'P') next = 'A';
+      else if (current === 'A') next = 'S';
+      else if (current === 'S') next = '-';
+
+      course.students[stIdx].att[dIdx] = next;
+      saveStore();
+      renderUnifiedTable();
+    }
+
+    function cyclePrelim(stIdx, field) {
+      const course = getActiveCourse();
+      const current = course.students[stIdx][field];
+      const cycle = { 'TEA': 'TEP', 'TEP': 'TED', 'TED': 'TEA' };
+      course.students[stIdx][field] = cycle[current] || 'TEA';
+      saveStore();
+      renderUnifiedTable();
+    }
+
+    function setGradePrompt(stIdx, exIdx) {
+      const course = getActiveCourse();
+      const st = course.students[stIdx];
+      const actual = st.grades[exIdx] || '';
+      const input = prompt(`Ingresa la nota (1 al 10) para ${st.name}:`, actual);
+
+      if (input !== null) {
+        const val = parseFloat(input);
+        if (!isNaN(val) && val >= 1 && val <= 10) {
+          st.grades[exIdx] = Math.round(val * 10) / 10;
+        } else if (input.trim() === '') {
+          delete st.grades[exIdx];
+        } else {
+          alert('Por favor introduce una nota entre 1 y 10.');
+        }
+        saveStore();
+        renderUnifiedTable();
+      }
+    }
+
+    function deleteExamColumn(exIdx) {
+      const course = getActiveCourse();
+      if (confirm(`¿Eliminar la evaluación "${course.exams[exIdx].name}"?`)) {
+        course.exams.splice(exIdx, 1);
+        course.students.forEach(st => {
+          if (st.grades[exIdx] !== undefined) st.grades.splice(exIdx, 1);
+        });
+        saveStore();
+        renderUnifiedTable();
+      }
+    }
+
+    /* AGENDA Y EVENTOS (HOME) */
+    function renderEventsList(filter = 'semana') {
+      const container = document.getElementById('eventsContainer');
+      container.innerHTML = '';
+
+      if (store.events.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-view">
+            <div class="empty-icon-circle">
+              <span class="material-symbols-rounded" style="font-size: 32px;">event_busy</span>
+            </div>
+            <h4>No hay eventos cargados</h4>
+            <p>Usa el botón "Nuevo Evento" para registrar paros, feriados o entregas de trabajos.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let list = store.events;
+      if (filter === 'semana') list = store.events.slice(0, 3);
+      else if (filter === 'mes') list = store.events.slice(0, 6);
+
+      list.forEach(ev => {
+        const el = document.createElement('div');
+        el.className = `event-card ${ev.type}`;
+        el.innerHTML = `
+          <div>
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px;">
+              ${ev.type.toUpperCase()} &bull; ${ev.course}
+            </div>
+            <h4 style="font-size: 14.5px; font-weight: 700; margin-bottom: 3px;">${ev.title}</h4>
+            <div style="font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
+              <span class="material-symbols-rounded" style="font-size: 14px;">calendar_today</span>
+              ${ev.date} - ${ev.time}
+            </div>
+          </div>
+          <button class="btn-icon" onclick="deleteEvent(${ev.id})" title="Borrar">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    function filterEvents(type, btn) {
+      btn.parentElement.querySelectorAll('.pill-filter').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      renderEventsList(type);
+    }
+
+    function deleteEvent(id) {
+      store.events = store.events.filter(e => e.id !== id);
+      saveStore();
+      renderEventsList('semana');
+    }
+
+    /* MODAL IMPRESIÓN */
+    function openPrintModal() {
+      const course = getActiveCourse();
+      if (!course) {
+        alert("Por favor selecciona primero un curso desde el menú izquierdo para imprimir su planilla.");
+        return;
+      }
+      openModal('modalPrint');
+    }
+
+    function executeCustomPrint() {
+      const course = getActiveCourse();
+      const school = getActiveSchool();
+      if (!course || !school) return;
+
+      const periodo = document.getElementById('printCuatrimestreSelect').value;
+      const filtroEstudiantes = document.getElementById('printFilterStudents').value;
+      const incPrelim = document.getElementById('printColPrelim').checked;
+      const incAtt = document.getElementById('printColAtt').checked;
+      const incExams = document.getElementById('printColExams').checked;
+      const incAvgVal = document.getElementById('printColAvgVal').checked;
+
+      let filteredExams = [];
+      if (incExams) {
+        course.exams.forEach((ex, idx) => {
+          const exTerm = ex.term || '1C';
+          if (periodo === 'ambos' || exTerm === periodo) {
+            filteredExams.push({ originalIdx: idx, name: ex.name, term: exTerm });
+          }
+        });
+      }
+
+      let studentsToPrint = [];
+      course.students.forEach(st => {
+        const validGrades = st.grades.filter(g => typeof g === 'number' && !isNaN(g));
+        let avg = validGrades.length > 0 ? (validGrades.reduce((a, b) => a + b, 0) / validGrades.length) : 0;
+        const vinoAlgunaVez = st.att.some(a => a === 'P');
+
+        let val = 'TEP';
+        if (!vinoAlgunaVez || validGrades.length === 0) val = 'TED';
+        else if (avg >= 7.0) val = 'TEA';
+        else val = 'TEP';
+
+        let cumpleFiltro = true;
+        if (filtroEstudiantes === 'aprobados') cumpleFiltro = (val === 'TEA');
+        else if (filtroEstudiantes === 'desaprobados') cumpleFiltro = (val === 'TEP' || val === 'TED');
+
+        if (cumpleFiltro) {
+          let p = 0, a = 0;
+          st.att.forEach(v => { if (v === 'P') p++; if (v === 'A') a++; });
+          let pct = (p + a) > 0 ? Math.round((p / (p + a)) * 100) : '-';
+
+          studentsToPrint.push({
+            name: st.name,
+            p1: st.p1,
+            p2: st.p2,
+            pct: pct,
+            grades: st.grades,
+            avg: avg > 0 ? avg.toFixed(1) : '-',
+            val: val
+          });
+        }
+      });
+
+      if (studentsToPrint.length === 0) {
+        alert("No se encontraron estudiantes con el filtro seleccionado (" + filtroEstudiantes + ").");
+        return;
+      }
+
+      const today = new Date().toLocaleDateString('es-AR');
+      const printContainer = document.getElementById('printReportArea');
+
+      let printHtml = `
+        <div style="border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h2 style="font-size: 17pt; margin: 0; font-family: 'Product Sans', Arial;">${school.name}</h2>
+              <div style="font-size: 11pt; margin-top: 3px;">
+                <b>Curso:</b> ${course.name} &nbsp;|&nbsp; <b>Materia:</b> ${course.subject}
+              </div>
+            </div>
+            <div style="text-align: right; font-size: 9.5pt;">
+              <div><b>Ciclo Lectivo:</b> 2026</div>
+              <div><b>Fecha:</b> ${today}</div>
+            </div>
+          </div>
+          <div style="margin-top: 5px; font-size: 10pt; color: #333;">
+            <b>Informe:</b> ${periodo === 'ambos' ? 'Trayectoria Anual Completa' : (periodo === '1C' ? '1er Cuatrimestre' : '2do Cuatrimestre')} &nbsp;|&nbsp; 
+            <b>Alumnos:</b> ${filtroEstudiantes === 'todos' ? 'Todos los inscriptos' : (filtroEstudiantes === 'aprobados' ? 'Solo Aprobados (TEA)' : 'Solo en Proceso / Desaprobados (TEP/TED)')}
+          </div>
+        </div>
+
+        <table class="print-report-table">
+          <thead>
+            <tr>
+              <th style="width: 25px;">#</th>
+              <th style="text-align: left; min-width: 200px;">Estudiante</th>
+      `;
+
+      if (incAtt) printHtml += `<th style="width: 55px;">% Asist.</th>`;
+
+      if (incPrelim) {
+        if (periodo === '1C' || periodo === 'ambos') printHtml += `<th style="width: 60px;">Inf. 1C</th>`;
+        if (periodo === '2C' || periodo === 'ambos') printHtml += `<th style="width: 60px;">Inf. 2C</th>`;
+      }
+
+      if (incExams) {
+        filteredExams.forEach(ex => {
+          printHtml += `<th style="font-size: 9pt;">${ex.name}</th>`;
+        });
+      }
+
+      if (incAvgVal) {
+        printHtml += `<th style="width: 55px;">Prom.</th><th style="width: 75px;">Valoración</th>`;
+      }
+
+      printHtml += `</tr></thead><tbody>`;
+
+      studentsToPrint.forEach((st, idx) => {
+        printHtml += `
+          <tr>
+            <td>${idx + 1}</td>
+            <td class="text-left">${st.name}</td>
+        `;
+
+        if (incAtt) printHtml += `<td>${st.pct === '-' ? '-' : st.pct + '%'}</td>`;
+
+        if (incPrelim) {
+          if (periodo === '1C' || periodo === 'ambos') printHtml += `<td><span class="badge-print">${st.p1}</span></td>`;
+          if (periodo === '2C' || periodo === 'ambos') printHtml += `<td><span class="badge-print">${st.p2}</span></td>`;
+        }
+
+        if (incExams) {
+          filteredExams.forEach(ex => {
+            const nota = st.grades[ex.originalIdx] !== undefined ? st.grades[ex.originalIdx] : '-';
+            printHtml += `<td><b>${nota}</b></td>`;
+          });
+        }
+
+        if (incAvgVal) {
+          printHtml += `
+            <td><b>${st.avg}</b></td>
+            <td><span class="badge-print">${st.val}</span></td>
+          `;
+        }
+
+        printHtml += `</tr>`;
+      });
+
+      printHtml += `</tbody></table>`;
+      printHtml += `
+        <div style="margin-top: 26px; display: flex; justify-content: space-between; font-size: 9.5pt;">
+          <div style="border-top: 1px solid #333; width: 190px; text-align: center; padding-top: 3px;">Firma del Docente</div>
+          <div style="border-top: 1px solid #333; width: 190px; text-align: center; padding-top: 3px;">Firma Equipo Directivo</div>
+        </div>
+      `;
+
+      printContainer.innerHTML = printHtml;
+      closeModal('modalPrint');
+
+      setTimeout(() => { window.print(); }, 250);
+    }
+
+    /* MODALES GENERALES */
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function openAddSchoolModal() { openModal('modalSchool'); }
+    function openAddStudentModal() { openModal('modalStudent'); }
+    function openAddExamModal() { openModal('modalExam'); }
+    function openAddEventModal() { openModal('modalEvent'); }
+    function openConfigDiasModal() { openModal('modalDiasClase'); }
+    function openIaModal() { openModal('modalIA'); }
+
+    function confirmAddSchool() {
+      const sName = document.getElementById('schoolNameInput').value.trim();
+      const cName = document.getElementById('courseNameInput').value.trim();
+      const subj = document.getElementById('subjectNameInput').value.trim();
+
+      if (!sName || !cName || !subj) return alert('Por favor completa todos los campos.');
+
+      const newSchool = {
+        id: Date.now(),
+        name: sName,
+        courses: [{
+          id: Date.now() + 1,
+          name: cName,
+          subject: subj,
+          dates: ["06/10", "13/10", "20/10", "27/10"],
+          students: [],
+          exams: []
+        }]
+      };
+
+      store.schools.push(newSchool);
+      saveStore();
+      renderSchoolsList();
+      closeModal('modalSchool');
+      document.getElementById('schoolNameInput').value = '';
+      document.getElementById('courseNameInput').value = '';
+      document.getElementById('subjectNameInput').value = '';
+
+      selectCourse(newSchool.id, newSchool.courses[0].id);
+      showAndroidToast("Escuela y curso creados");
+    }
+
+    function openAddCourseToSchool(schoolId) {
+      const cName = prompt('Nombre del Curso (ej: 4° 2da):');
+      if (!cName) return;
+      const subj = prompt('Materia (ej: Biología):');
+      if (!subj) return;
+
+      const school = store.schools.find(s => s.id === schoolId);
+      const newCourse = {
+        id: Date.now(),
+        name: cName,
+        subject: subj,
+        dates: ["06/10", "13/10", "20/10", "27/10"],
+        students: [],
+        exams: []
+      };
+      school.courses.push(newCourse);
+      saveStore();
+      renderSchoolsList();
+      selectCourse(school.id, newCourse.id);
+      showAndroidToast("Curso creado con éxito");
+    }
+
+    function confirmAddStudent() {
+      const course = getActiveCourse();
+      const name = document.getElementById('studentNameInput').value.trim();
+      if (!name) return alert('Ingresa el nombre del estudiante');
+
+      course.students.push({
+        id: Date.now(),
+        name: name,
+        att: new Array(course.dates.length).fill('-'), // Inicialmente vacíos
+        p1: 'TEA',
+        p2: 'TEA',
+        grades: []
+      });
+
+      saveStore();
+      renderUnifiedTable();
+      closeModal('modalStudent');
+      document.getElementById('studentNameInput').value = '';
+      showAndroidToast("Estudiante agregado");
+    }
+
+    function confirmAddExam() {
+      const course = getActiveCourse();
+      const term = document.getElementById('examCuatrimestreSelect').value;
+      const type = document.getElementById('examTypeSelect').value;
+      const title = document.getElementById('examTitleInput').value.trim();
+      if (!title) return alert('Ingresa el título del trabajo o examen');
+
+      course.exams.push({
+        id: Date.now(),
+        term: term,
+        name: `${type}: ${title}`
+      });
+
+      saveStore();
+      renderUnifiedTable();
+      closeModal('modalExam');
+      document.getElementById('examTitleInput').value = '';
+      showAndroidToast("Evaluación agregada a la planilla");
+    }
+
+    function confirmAddEvent() {
+      const type = document.getElementById('evType').value;
+      const title = document.getElementById('evTitle').value.trim();
+      const date = document.getElementById('evDate').value;
+      const time = document.getElementById('evTime').value;
+      const course = document.getElementById('evCourse').value || 'General';
+
+      if (!title || !date) return alert('Completa el título y la fecha del evento.');
+
+      store.events.push({ id: Date.now(), type, title, date, time, course });
+      saveStore();
+      renderEventsList('semana');
+      closeModal('modalEvent');
+      document.getElementById('evTitle').value = '';
+      showAndroidToast("Evento agregado al calendario");
+    }
+
+    function generateClassDates() {
+      const course = getActiveCourse();
+      const days = [];
+      if (document.getElementById('d-1').checked) days.push(1);
+      if (document.getElementById('d-2').checked) days.push(2);
+      if (document.getElementById('d-3').checked) days.push(3);
+      if (document.getElementById('d-4').checked) days.push(4);
+      if (document.getElementById('d-5').checked) days.push(5);
+
+      if (days.length === 0) return alert('Elige al menos un día');
+
+      const dates = [];
+      for (let i = 1; i <= 30 && dates.length < 8; i++) {
+        const d = new Date(2026, 9, i);
+        if (days.includes(d.getDay())) {
+          dates.push(`${String(i).padStart(2,'0')}/10`);
+        }
+      }
+
+      course.dates = dates;
+      course.students.forEach(st => {
+        st.att = new Array(dates.length).fill('-'); // Inicialmente vacíos
+      });
+
+      saveStore();
+      renderUnifiedTable();
+      closeModal('modalDiasClase');
+      showAndroidToast("Fechas creadas (vacías) en la planilla");
+    }
+
+    /* ASISTENTE HACHE IA */
+    function sendIaMessage() {
+      const input = document.getElementById('iaInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendChatMessage(text, 'user');
+      input.value = '';
+
+      setTimeout(() => {
+        const reply = getIaPedagogicAnswer(text);
+        appendChatMessage(reply, 'ia');
+      }, 500);
+    }
+
+    function askQuickPrompt(txt) {
+      appendChatMessage(txt, 'user');
+      setTimeout(() => {
+        const reply = getIaPedagogicAnswer(txt);
+        appendChatMessage(reply, 'ia');
+      }, 500);
+    }
+
+    function appendChatMessage(text, sender) {
+      const chat = document.getElementById('iaChatBox');
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble bubble-${sender}`;
+      bubble.innerHTML = text;
+      chat.appendChild(bubble);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function getIaPedagogicAnswer(query) {
+      const q = query.toLowerCase();
+      if (q.includes('ausencia') || q.includes('familia') || q.includes('comunicado')) {
+        return `<b>Modelo de Comunicación a las Familias:</b><br><br>
+        <i>"Estimada familia: Me pongo en contacto desde la institución escolar para comunicarles nuestra inquietud ante las reiteradas inasistencias del estudiante en este período. Les solicitamos coordinar una entrevista a fin de convenir alternativas pedagógicas que aseguren la continuidad de su trayectoria escolar (TEA)."</i>`;
+      }
+      if (q.includes('rúbrica') || q.includes('rubrica')) {
+        return `<b>Propuesta de Criterios de Evaluación:</b><br>
+        1. <b>Apropiación de conceptos (40%):</b> Explica ideas centrales con vocabulario específico.<br>
+        2. <b>Resolución práctica (30%):</b> Cumplimiento en tiempo y forma de las consignas.<br>
+        3. <b>Argumentación y juicio crítico (30%):</b> Reflexión fundamentada.`;
+      }
+      return `Analicé tu consulta pedagógica: <i>"${query}"</i>.<br><br>
+      Te sugiero organizar la clase en 3 momentos didácticos:<br>
+      1. <b>Inicio (15 min):</b> Pregunta disparadora vinculada a la realidad de los alumnos.<br>
+      2. <b>Desarrollo (50 min):</b> Producción en parejas o equipos pequeños con consignas guiadas.<br>
+      3. <b>Cierre (15 min):</b> Síntesis colectiva y registro en carpetas para fijar conceptos.`;
+    }
+  </script>
+</body>
+</html>
